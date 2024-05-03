@@ -8,7 +8,11 @@ CALLPYTHON=python
 # /usr is the default for installing via the apt package manager on Ubuntu:
 if [ -d /usr/lib/fieldworks ]; then
     prefix=/usr
+    is_flatpak=false
+    pythonnet_version=$($CALLPYTHON -c "from importlib.metadata import version; print(version('pythonnet').split('.')[0])")
+    sys_mono_version=$(mono --version=number)
 else # default flatpak
+    is_flatpak=true
     prefix=/var/lib/flatpak/app/org.sil.FieldWorks/current/active/files
 fi
 
@@ -39,5 +43,11 @@ cd $scriptdir
 
 # reset environment as defined above
 resetenviron
+
+if [ $is_flatpak == false ] && [ $pythonnet_version == 3 ] ; then
+    export MONO_GAC_PREFIX="/lib/mono/gac"
+    export MONO_RUNTIME=$sys_mono_version
+    export PYTHONNET_MONO_LIBMONO=/lib/libmono-2.0.so.1
+fi
 
 exec $CALLPYTHON scripts/RunFlexTools.py DEBUG
