@@ -6,7 +6,11 @@ CALLPYTHON=python
 
 # Configure the prefix to the path where FieldWorks is installed.
 # /usr is the default for installing via the apt package manager on Ubuntu:
-prefix=/usr
+if [ -d /usr/lib/fieldworks ]; then
+    prefix=/usr
+else # default flatpak
+    prefix=/var/lib/flatpak/app/org.sil.FieldWorks/current/active/files
+fi
 
 # In order to function correctly on Linux,
 # we need to source a shell script (environ), which
@@ -16,6 +20,7 @@ prefix=/usr
 # the caller which were erased.
 resetenviron() {
     echo "Resetting environment"
+
 }
 
 
